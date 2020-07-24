@@ -1,6 +1,8 @@
 class Task {
 
-  Task({this.title = "", this.done = false});
+  Task({this.id, this.title = "", this.done = false});
+
+  int id;
 
   String title;
 
