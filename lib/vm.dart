@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import 'Task.dart';
+import 'task.dart';
 import 'db.dart' as db;
 
 class MainViewModel with ChangeNotifier {

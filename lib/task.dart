@@ -6,7 +6,5 @@ class Task {
 
   String title;
 
-  String detail;
-
   bool done;
 }
