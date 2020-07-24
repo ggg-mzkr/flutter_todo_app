@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
-import 'package:todo_app/MainViewModel.dart';
-import 'package:todo_app/Task.dart';
+import 'package:todo_app/vm.dart';
+import 'package:todo_app/task.dart';
 
 void main() => runApp(TodoApp());
 
@@ -13,6 +13,7 @@ class TodoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Todo App',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(primarySwatch: Colors.blue),
         home: ChangeNotifierProvider(
           create: (context) => MainViewModel(),
@@ -35,6 +36,7 @@ class HomePage extends StatelessWidget {
           itemCount: vm.tasks.length,
         ),
       floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
           onPressed: () {
             showDialog(
               context: context,
