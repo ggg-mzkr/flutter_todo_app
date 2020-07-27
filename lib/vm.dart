@@ -17,6 +17,11 @@ class MainViewModel with ChangeNotifier {
      notifyListeners();
    });
   }
+  
+  void toggleShow(Task task) {
+    task.show = ! task.show;
+    notifyListeners();
+  }
 
   void addTask(Task task) {
     _tasks.add(task);

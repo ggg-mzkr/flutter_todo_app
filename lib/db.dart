@@ -12,6 +12,7 @@ part 'db.g.dart';
 class Tasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get title => text()();
+  TextColumn get content => text()();
   BoolColumn get done => boolean()();
 }
 
@@ -24,14 +25,14 @@ LazyDatabase _openConnection() {
 }
 
 @UseMoor(tables: [Tasks])
-class TaskRepository extends _$DBflutter {
+class TaskRepository extends _$TaskRepository {
   TaskRepository() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   Future<List<dto.Task>> get all => select(tasks)
-      .map((Task t) => new dto.Task(id: t.id, title: t.title, done: t.done))
+      .map((Task t) => new dto.Task(id: t.id, title: t.title, content: t.content, done: t.done))
       .get()
   ;
 
@@ -43,7 +44,20 @@ class TaskRepository extends _$DBflutter {
     return into(tasks).insertOnConflictUpdate(Task(
         id: task.id,
         title: task.title,
+        content: task.content,
         done: task.done
     ));
   }
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+      onCreate: (Migrator m) {
+        return m.createAll();
+      },
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (from == 1) {
+          await m.addColumn(tasks, tasks.content);
+        }
+      }
+  );
 }

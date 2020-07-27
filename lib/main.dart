@@ -69,16 +69,32 @@ class HomePage extends StatelessWidget {
         child: Padding(
             padding: EdgeInsets.all(1.0),
             child: Card(
-                child: ListTile(
-                  title: Text(task.title, style: style,),
-                  trailing: IconButton(
-                    icon: Icon(task.done? Icons.check_box: Icons.check_box_outline_blank,),
-                    onPressed: () => vm.turnTask(task),
-                  ),
-                  onTap: () => {},
-                  onLongPress: ()  {
-                    showDialog(context: context, builder: (context) => _dialog(task, context, vm.saveTask));
-                  },
+                child: Column(
+                  children: <Widget>[
+                    ListTile(
+                      title: Text(task.title, style: style,),
+                      trailing: IconButton(
+                        icon: Icon(task.done? Icons.check_box: Icons.check_box_outline_blank,),
+                        onPressed: () => vm.turnTask(task),
+                      ),
+                      onTap: () => { vm.toggleShow(task) },
+                      onLongPress: ()  {
+                        showDialog(context: context, builder: (context) => _dialog(task, context, vm.saveTask));
+                      },
+                    ),
+                    Visibility(
+                      visible: task.show,
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: Border(top: BorderSide(color: Colors.black, width: 1.0)),
+                        ),
+                        margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 20.0),
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(task.content, textAlign: TextAlign.left,),
+                      ),
+                    )
+                  ],
                 )
             )
         )
@@ -87,27 +103,39 @@ class HomePage extends StatelessWidget {
 
   Widget _dialog(Task task, BuildContext context, handler) {
     final _formKey = GlobalKey<FormState>();
-    String _input = task.title;
+    String _title = task.title;
+    String _content = task.content;
 
     return AlertDialog(
       title: Text("Edit"),
       content:  Form(
-        key: _formKey,
-        child: Container(
-          child: TextFormField(
-            decoration: InputDecoration(hintText: 'title'),
-            validator: (value) => value.isEmpty ?'Please enter some text': null,
-            initialValue: _input,
-            onChanged: (e) => _input = e,
-          ),
-        ),
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextFormField(
+                decoration: InputDecoration(hintText: 'title'),
+                validator: (value) => value.isEmpty ?'Please enter some text': null,
+                initialValue: _title,
+                onChanged: (e) => _title = e,
+              ),
+              TextFormField(
+                decoration: InputDecoration(hintText: 'content'),
+                maxLines: 10,
+                minLines: 3,
+                initialValue: _content,
+                onChanged: (e) => _content = e,
+              ),
+            ],
+          )
       ),
       actions: <Widget>[
         FlatButton(
           child: Text("Save"),
           onPressed: () {
             if (_formKey.currentState.validate()) {
-              task.title = _input;
+              task.title = _title;
+              task.content = _content;
               handler(task);
               Navigator.of(context).pop();
             }

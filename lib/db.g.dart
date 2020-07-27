@@ -10,8 +10,13 @@ part of 'db.dart';
 class Task extends DataClass implements Insertable<Task> {
   final int id;
   final String title;
+  final String content;
   final bool done;
-  Task({@required this.id, @required this.title, @required this.done});
+  Task(
+      {@required this.id,
+      @required this.title,
+      @required this.content,
+      @required this.done});
   factory Task.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -22,6 +27,8 @@ class Task extends DataClass implements Insertable<Task> {
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
       title:
           stringType.mapFromDatabaseResponse(data['${effectivePrefix}title']),
+      content:
+          stringType.mapFromDatabaseResponse(data['${effectivePrefix}content']),
       done: boolType.mapFromDatabaseResponse(data['${effectivePrefix}done']),
     );
   }
@@ -34,6 +41,9 @@ class Task extends DataClass implements Insertable<Task> {
     if (!nullToAbsent || title != null) {
       map['title'] = Variable<String>(title);
     }
+    if (!nullToAbsent || content != null) {
+      map['content'] = Variable<String>(content);
+    }
     if (!nullToAbsent || done != null) {
       map['done'] = Variable<bool>(done);
     }
@@ -45,6 +55,9 @@ class Task extends DataClass implements Insertable<Task> {
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       title:
           title == null && nullToAbsent ? const Value.absent() : Value(title),
+      content: content == null && nullToAbsent
+          ? const Value.absent()
+          : Value(content),
       done: done == null && nullToAbsent ? const Value.absent() : Value(done),
     );
   }
@@ -55,6 +68,7 @@ class Task extends DataClass implements Insertable<Task> {
     return Task(
       id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
+      content: serializer.fromJson<String>(json['content']),
       done: serializer.fromJson<bool>(json['done']),
     );
   }
@@ -64,13 +78,15 @@ class Task extends DataClass implements Insertable<Task> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
+      'content': serializer.toJson<String>(content),
       'done': serializer.toJson<bool>(done),
     };
   }
 
-  Task copyWith({int id, String title, bool done}) => Task(
+  Task copyWith({int id, String title, String content, bool done}) => Task(
         id: id ?? this.id,
         title: title ?? this.title,
+        content: content ?? this.content,
         done: done ?? this.done,
       );
   @override
@@ -78,55 +94,67 @@ class Task extends DataClass implements Insertable<Task> {
     return (StringBuffer('Task(')
           ..write('id: $id, ')
           ..write('title: $title, ')
+          ..write('content: $content, ')
           ..write('done: $done')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      $mrjf($mrjc(id.hashCode, $mrjc(title.hashCode, done.hashCode)));
+  int get hashCode => $mrjf($mrjc(id.hashCode,
+      $mrjc(title.hashCode, $mrjc(content.hashCode, done.hashCode))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is Task &&
           other.id == this.id &&
           other.title == this.title &&
+          other.content == this.content &&
           other.done == this.done);
 }
 
 class TasksCompanion extends UpdateCompanion<Task> {
   final Value<int> id;
   final Value<String> title;
+  final Value<String> content;
   final Value<bool> done;
   const TasksCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
+    this.content = const Value.absent(),
     this.done = const Value.absent(),
   });
   TasksCompanion.insert({
     this.id = const Value.absent(),
     @required String title,
+    @required String content,
     @required bool done,
   })  : title = Value(title),
+        content = Value(content),
         done = Value(done);
   static Insertable<Task> custom({
     Expression<int> id,
     Expression<String> title,
+    Expression<String> content,
     Expression<bool> done,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (title != null) 'title': title,
+      if (content != null) 'content': content,
       if (done != null) 'done': done,
     });
   }
 
   TasksCompanion copyWith(
-      {Value<int> id, Value<String> title, Value<bool> done}) {
+      {Value<int> id,
+      Value<String> title,
+      Value<String> content,
+      Value<bool> done}) {
     return TasksCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
+      content: content ?? this.content,
       done: done ?? this.done,
     );
   }
@@ -140,6 +168,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
     if (done.present) {
       map['done'] = Variable<bool>(done.value);
     }
@@ -151,6 +182,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     return (StringBuffer('TasksCompanion(')
           ..write('id: $id, ')
           ..write('title: $title, ')
+          ..write('content: $content, ')
           ..write('done: $done')
           ..write(')'))
         .toString();
@@ -182,6 +214,18 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     );
   }
 
+  final VerificationMeta _contentMeta = const VerificationMeta('content');
+  GeneratedTextColumn _content;
+  @override
+  GeneratedTextColumn get content => _content ??= _constructContent();
+  GeneratedTextColumn _constructContent() {
+    return GeneratedTextColumn(
+      'content',
+      $tableName,
+      false,
+    );
+  }
+
   final VerificationMeta _doneMeta = const VerificationMeta('done');
   GeneratedBoolColumn _done;
   @override
@@ -195,7 +239,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
   }
 
   @override
-  List<GeneratedColumn> get $columns => [id, title, done];
+  List<GeneratedColumn> get $columns => [id, title, content, done];
   @override
   $TasksTable get asDslTable => this;
   @override
@@ -215,6 +259,12 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
           _titleMeta, title.isAcceptableOrUnknown(data['title'], _titleMeta));
     } else if (isInserting) {
       context.missing(_titleMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(_contentMeta,
+          content.isAcceptableOrUnknown(data['content'], _contentMeta));
+    } else if (isInserting) {
+      context.missing(_contentMeta);
     }
     if (data.containsKey('done')) {
       context.handle(
@@ -239,8 +289,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
   }
 }
 
-abstract class _$DBflutter extends GeneratedDatabase {
-  _$DBflutter(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
+abstract class _$TaskRepository extends GeneratedDatabase {
+  _$TaskRepository(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   $TasksTable _tasks;
   $TasksTable get tasks => _tasks ??= $TasksTable(this);
   @override
