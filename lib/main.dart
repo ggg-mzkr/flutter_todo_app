@@ -47,7 +47,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _listItem(BuildContext context, int index) {
+  Dismissible _listItem(BuildContext context, int index) {
     MainViewModel vm = Provider.of<MainViewModel>(context);
     Task task = vm.tasks[index];
     TextStyle style = TextStyle(
@@ -56,19 +56,27 @@ class HomePage extends StatelessWidget {
         decoration: task.done ? TextDecoration.lineThrough : TextDecoration.none
     );
 
-    return Container(
-      decoration: new BoxDecoration(
-          border: new Border(bottom: BorderSide(width: 1.0, color: Colors.grey))
-      ),
-      child: ListTile(
-        title: Text(task.title, style: style,),
-        onTap: () => vm.turnTask(task),
-        onLongPress: ()  {
-          showDialog(
+    return Dismissible(
+      key: Key(task.id.toString()),
+      direction: DismissDirection.endToStart,
+      onDismissed: (_) => {
+        vm.removeTask(task)
+      },
+      background: Container(color: Colors.red),
+      child: Container(
+        decoration: new BoxDecoration(
+            border: new Border(bottom: BorderSide(width: 1.0, color: Colors.grey))
+        ),
+        child: ListTile(
+          title: Text(task.title, style: style,),
+          onTap: () => vm.turnTask(task),
+          onLongPress: ()  {
+            showDialog(
               context: context,
               builder: (context) => _dialog(task, context, vm.saveTask),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

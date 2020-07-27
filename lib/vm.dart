@@ -28,6 +28,11 @@ class MainViewModel with ChangeNotifier {
     saveTask(task);
   }
 
+  void removeTask(Task task) {
+    _tasks.remove(task);
+    _repository.remove(task).then((value) => notifyListeners());
+  }
+
   void saveTask(Task task) {
     _repository.upsert(task).then((_) => notifyListeners());
   }

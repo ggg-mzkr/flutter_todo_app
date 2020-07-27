@@ -35,6 +35,10 @@ class TaskRepository extends _$DBflutter {
       .get()
   ;
 
+  Future<void> remove(dto.Task task) {
+    return (delete(tasks)..where((it) => it.id.equals(task.id))).go();
+  }
+
   Future<void> upsert(dto.Task task) {
     return into(tasks).insertOnConflictUpdate(Task(
         id: task.id,
