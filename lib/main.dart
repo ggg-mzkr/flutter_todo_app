@@ -57,27 +57,31 @@ class HomePage extends StatelessWidget {
     );
 
     return Dismissible(
-      key: Key(task.id.toString()),
-      direction: DismissDirection.endToStart,
-      onDismissed: (_) => {
-        vm.removeTask(task)
-      },
-      background: Container(color: Colors.red),
-      child: Container(
-        decoration: new BoxDecoration(
-            border: new Border(bottom: BorderSide(width: 1.0, color: Colors.grey))
+        key: Key(task.id.toString()),
+        direction: DismissDirection.endToStart,
+        onDismissed: (_) => {
+          vm.removeTask(task)
+        },
+        background: Padding(
+            padding: EdgeInsets.all(1.0),
+            child: Container(color: Colors.red)
         ),
-        child: ListTile(
-          title: Text(task.title, style: style,),
-          onTap: () => vm.turnTask(task),
-          onLongPress: ()  {
-            showDialog(
-              context: context,
-              builder: (context) => _dialog(task, context, vm.saveTask),
-            );
-          },
-        ),
-      ),
+        child: Padding(
+            padding: EdgeInsets.all(1.0),
+            child: Card(
+                child: ListTile(
+                  title: Text(task.title, style: style,),
+                  trailing: IconButton(
+                    icon: Icon(task.done? Icons.check_box: Icons.check_box_outline_blank,),
+                    onPressed: () => vm.turnTask(task),
+                  ),
+                  onTap: () => {},
+                  onLongPress: ()  {
+                    showDialog(context: context, builder: (context) => _dialog(task, context, vm.saveTask));
+                  },
+                )
+            )
+        )
     );
   }
 
